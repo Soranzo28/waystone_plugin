@@ -1,0 +1,7 @@
+target/
+*.iws
+*.iml
+*.ipr
+.idea/
+waystones.yml
+deploy.sh
