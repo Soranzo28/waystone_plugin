@@ -4,3 +4,21 @@ main: dev.soranzo.Waystone
 api-version: '26.1.2'
 description: Waystone system inspired by the Waystones mod.
 authors: [soranzo]
+commands:
+  waystone:
+    description: Waystone admin commands
+    usage: /waystone <list|delete <name>|reload>
+    permission: waystones.admin
+permissions:
+  waystones.use:
+    description: Discover and teleport via waystones
+    default: true
+  waystones.place:
+    description: Place waystone blocks
+    default: true
+  waystones.break:
+    description: Break other player's waystones
+    default: op
+  waystones.admin:
+    description: acess to admin commands
+    default: op

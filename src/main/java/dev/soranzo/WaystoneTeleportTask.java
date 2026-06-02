@@ -35,9 +35,11 @@ public class WaystoneTeleportTask implements Runnable {
                 continue;
             }
             if (!wm.isThisBlockWaystone(blockBelow.getLocation())) continue;
+            if (!player.hasPermission("waystones.use")) continue;
             if (wm.isOnCooldown(player.getUniqueId())) continue;
 
             PlayerYamlDTO pInfo = wm.getDiscoveries().get(player.getUniqueId());
+            if (pInfo == null) continue;
             String blockBelowLocationString = wm.locationToString(blockBelow.getLocation());
 
             String connectionString = pInfo.connections().getOrDefault(blockBelowLocationString, "");
@@ -51,7 +53,7 @@ public class WaystoneTeleportTask implements Runnable {
                         blockBelow.getLocation().clone().add(0.5, 1.0, 0.5), 20, 0.3, 0.3, 0.3, 0.15);
                 continue;
             }
-            if (System.currentTimeMillis() - standingOn.get(player.getUniqueId()) < WaystoneConstants.STANDING_TP_DELAY) continue;
+            if (System.currentTimeMillis() - standingOn.get(player.getUniqueId()) < wm.getStandingDelay()) continue;
             standingOn.remove(player.getUniqueId());
 
             tpLocation.add(0.5, 1, 0.5);

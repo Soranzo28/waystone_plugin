@@ -1,8 +1,11 @@
 package dev.soranzo.dto;
 
+import java.util.UUID;
+
 public record WaystoneYamlDTO(
     String stringLocation,
     String name,
-    boolean active
+    boolean active,
+    UUID owner
 ) {
 }

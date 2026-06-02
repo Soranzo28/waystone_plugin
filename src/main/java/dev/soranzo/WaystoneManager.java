@@ -42,6 +42,21 @@ public class WaystoneManager {
     public HashMap<String, WaystoneYamlDTO> getWaystones() { return waystonesInfo; }
     public HashMap<UUID, PlayerYamlDTO> getDiscoveries() { return playerInfo; }
 
+    public List<WaystoneYamlDTO> getWaystonesByName(String name) {
+        return waystonesInfo.values().stream()
+                .filter(w -> w.name().equalsIgnoreCase(name))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    public void reload() {
+        plugin.reloadConfig();
+        data = YamlConfiguration.loadConfiguration(file);
+        waystonesInfo.clear();
+        playerInfo.clear();
+        populateWaystones();
+        populateDiscoveries();
+    }
+
 
     //Helper methods
     private void populateWaystones() {
@@ -50,8 +65,10 @@ public class WaystoneManager {
         for (String key : data.getConfigurationSection("waystones").getKeys(false)){
             String name = data.getString("waystones." + key + ".name");
             boolean active = data.getBoolean("waystones." + key + ".active");
+            String ownerStr = data.getString("waystones." + key + ".owner");
+            UUID owner = ownerStr != null ? UUID.fromString(ownerStr) : null;
 
-            waystonesInfo.put(key, new WaystoneYamlDTO(key, name, active));
+            waystonesInfo.put(key, new WaystoneYamlDTO(key, name, active, owner));
         }
     }
 
@@ -113,10 +130,18 @@ public class WaystoneManager {
         return waystonesInfo.containsKey(locationToString(location));
     }
 
+    public long getStandingDelay() {
+        return plugin.getConfig().getLong("standing-delay", 10) * 50L;
+    }
+
+    public long getCooldownDelay() {
+        return plugin.getConfig().getLong("teleport-cooldown", 3) * 1000L;
+    }
+
     public boolean isOnCooldown(UUID uuid) {
         Long time = cooldowns.get(uuid);
         if (time == null) return false;
-        if (System.currentTimeMillis() - time >= WaystoneConstants.GRACE_TP_DELAY) {
+        if (System.currentTimeMillis() - time >= getCooldownDelay()) {
             cooldowns.remove(uuid);
             return false;
         }
@@ -138,9 +163,10 @@ public class WaystoneManager {
         //Creates new waystone entry
         data.set("waystones." + locationToString(location) + ".name", name);
         data.set("waystones." + locationToString(location) + ".active", false);
+        data.set("waystones." + locationToString(location) + ".owner", playerUUID.toString());
         saveDataFile();
 
-        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, false));
+        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, false, playerUUID));
     }
 
     public void unregisterWaystone(Location location) {
@@ -203,7 +229,7 @@ public class WaystoneManager {
 
         WaystoneYamlDTO old = waystonesInfo.get(locationToString(location));
         if (old == null) return;
-        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), old.name(), true));
+        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), old.name(), true, old.owner()));
     }
 
     public void setWaystoneInactive(Location location) {
@@ -212,7 +238,7 @@ public class WaystoneManager {
 
         WaystoneYamlDTO old = waystonesInfo.get(locationToString(location));
         if (old == null) return;
-        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), old.name(), false));
+        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), old.name(), false, old.owner()));
     }
 
     public void setWaystoneName(Location location, String name) {
@@ -220,7 +246,7 @@ public class WaystoneManager {
         saveDataFile();
         WaystoneYamlDTO old = waystonesInfo.get(locationToString(location));
         if (old == null) return;
-        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, old.active()));
+        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, old.active(), old.owner()));
 
     }
 }

@@ -3,6 +3,7 @@ package dev.soranzo.listeners;
 import dev.soranzo.*;
 import dev.soranzo.dto.WaystoneYamlDTO;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -26,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import java.util.List;
+import java.util.UUID;
 
 public class WaystoneRegisterListener implements Listener {
     private final Waystone pl;
@@ -46,7 +48,14 @@ public class WaystoneRegisterListener implements Listener {
         boolean isWaystone = meta.getPersistentDataContainer().has(WaystoneConstants.IS_WAYSTONE_KEY, PersistentDataType.BOOLEAN);
 
         if (!isWaystone) return;
-
+        if (!event.getPlayer().hasPermission("waystones.place")) {
+            event.setCancelled(true);
+            Player player = event.getPlayer();
+            player.sendMessage(Component.text("✦ You don't have permission to place waystones.")
+                    .color(TextColor.color(0xff6b6b)));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            return;
+        }
         wm.registerNewWaystone(event.getBlock().getLocation(), "nameless", event.getPlayer().getUniqueId());
 
         Player player = event.getPlayer();
@@ -60,6 +69,18 @@ public class WaystoneRegisterListener implements Listener {
         if (wm.isThisBlockWaystone(event.getBlock().getLocation())) {
             Player player = event.getPlayer();
             Location loc = event.getBlock().getLocation();
+
+            WaystoneYamlDTO waystone = wm.getWaystones().get(wm.locationToString(loc));
+            UUID owner = waystone != null ? waystone.owner() : null;
+            boolean isOwner = player.getUniqueId().equals(owner);
+            if (!isOwner && !player.hasPermission("waystones.break")) {
+                event.setCancelled(true);
+                player.sendMessage(Component.text("✦ You are not the owner of this waystone.")
+                        .color(TextColor.color(0xff6b6b)));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                return;
+            }
+
             player.playSound(player.getLocation(), Sound.BLOCK_LODESTONE_BREAK, 1.0f, 0.8f);
             loc.getWorld().spawnParticle(Particle.SMOKE, loc.clone().add(0.5, 0.5, 0.5), 30, 0.3, 0.3, 0.3, 0.05);
             loc.getWorld().spawnParticle(Particle.LARGE_SMOKE, loc.clone().add(0.5, 0.5, 0.5), 8, 0.3, 0.3, 0.3, 0.0);
@@ -73,6 +94,16 @@ public class WaystoneRegisterListener implements Listener {
             if (!wm.isThisBlockWaystone(attached.getLocation())) return;
 
             Player player = event.getPlayer();
+            WaystoneYamlDTO attachedWaystone = wm.getWaystones().get(wm.locationToString(attached.getLocation()));
+            UUID attachedOwner = attachedWaystone != null ? attachedWaystone.owner() : null;
+            if (!player.getUniqueId().equals(attachedOwner) && !player.hasPermission("waystones.break")) {
+                event.setCancelled(true);
+                player.sendMessage(Component.text("✦ You are not the owner of this waystone.")
+                        .color(TextColor.color(0xff6b6b)));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                return;
+            }
+
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f);
             attached.getLocation().getWorld().spawnParticle(Particle.SMOKE,
                     attached.getLocation().clone().add(0.5, 1.5, 0.5), 20, 0.2, 0.3, 0.2, 0.02);
@@ -129,15 +160,25 @@ public class WaystoneRegisterListener implements Listener {
             }
         }
 
-        if (name == null) return;
-
         WaystoneYamlDTO existing = wm.getWaystones().get(wm.locationToString(attached.getLocation()));
         String oldName = existing.name();
+
+        UUID owner = existing.owner();
+        Player player = event.getPlayer();
+        boolean isOwner = player.getUniqueId().equals(owner);
+        if (!isOwner && !player.hasPermission("waystones.break")) {
+            event.setCancelled(true);
+            player.sendMessage(Component.text("✦ You are not the owner of this waystone.")
+                    .color(TextColor.color(0xff6b6b)));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            return;
+        }
+
+        if (name == null) return;
 
         wm.setWaystoneName(attached.getLocation(), name);
         wm.setWaystoneActive(attached.getLocation());
 
-        Player player = event.getPlayer();
         Location attachedCenter = attached.getLocation().clone().add(0.5, 0.5, 0.5);
         attached.getLocation().getWorld().spawnParticle(Particle.CLOUD, attachedCenter, 30, 0.3, 0.4, 0.3, 0.05);
         if ("nameless".equals(oldName)) {
@@ -172,6 +213,14 @@ public class WaystoneRegisterListener implements Listener {
         if (block == null) return;
         if (block.getType() != Material.LODESTONE) return;
         if (!wm.isThisBlockWaystone(block.getLocation())) return;
+
+        if (!event.getPlayer().hasPermission("waystones.use")) {
+            Player player = event.getPlayer();
+            player.sendMessage(Component.text("✦ You don't have permission to use waystones.")
+                    .color(TextColor.color(0xff6b6b)));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            return;
+        }
 
         if (!wm.getWaystoneStatus(block.getLocation())) {
             Player player = event.getPlayer();
@@ -220,15 +269,16 @@ public class WaystoneRegisterListener implements Listener {
 
         boolean isWaystone = false;
         boolean isArrow = false;
+        boolean isAuthor = false;
 
         ItemMeta meta = clicked.getItemMeta();
 
         if (meta.getPersistentDataContainer().has(WaystoneConstants.WAYSTONE_LOCATION_KEY, PersistentDataType.STRING)) {
             isWaystone = true;
-
-        }
-        else if (meta.getPersistentDataContainer().has(WaystoneConstants.WAYSTONE_PAGE_KEY, PersistentDataType.INTEGER)) {
+        } else if (meta.getPersistentDataContainer().has(WaystoneConstants.WAYSTONE_PAGE_KEY, PersistentDataType.INTEGER)) {
             isArrow = true;
+        } else if (meta.getPersistentDataContainer().has(WaystoneConstants.WAYSTONE_AUTHOR_KEY, PersistentDataType.BOOLEAN)) {
+            isAuthor = true;
         }
 
         if (isWaystone) {
@@ -257,6 +307,27 @@ public class WaystoneRegisterListener implements Listener {
                             .decorate(TextDecoration.BOLD)));
             p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.5f);
             p.closeInventory();
+        }
+        else if (isAuthor) {
+            Player p = (Player) event.getWhoClicked();
+            p.closeInventory();
+            TextColor purple = TextColor.color(0x818cf8);
+            TextColor gold   = TextColor.color(0xffd700);
+            TextColor white  = TextColor.color(0xffffff);
+            TextColor gray   = TextColor.color(0xa0aec0);
+            String line = "======================";
+            p.sendMessage(Component.text("✦ " + line + " AUTOR " + line + " ✦").color(purple));
+            p.sendMessage(
+                Component.text("  Nome    ").color(gray)
+                    .append(Component.text("Patolheiro").color(gold))
+            );
+            p.sendMessage(
+                Component.text("  Github  ").color(gray)
+                    .append(Component.text("github.com/Soranzo28").color(white)
+                        .clickEvent(ClickEvent.openUrl("https://github.com/Soranzo28"))
+                        .decorate(TextDecoration.UNDERLINED))
+            );
+            p.sendMessage(Component.text("+ " + line + "===============" + line + " +").color(purple));
         }
         else if (isArrow) {
             Player p = (Player) event.getWhoClicked();
