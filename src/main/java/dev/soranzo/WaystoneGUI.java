@@ -4,6 +4,7 @@ import dev.soranzo.dto.PlayerYamlDTO;
 import dev.soranzo.dto.WaystoneYamlDTO;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,7 +31,7 @@ public class WaystoneGUI implements InventoryHolder {
         this.originLocation = originLocation;
 
         //Static itens for decoration
-        ItemStack glassPane = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+        ItemStack glassPane = new ItemStack(Material.CYAN_STAINED_GLASS_PANE);
         ItemMeta gMeta = glassPane.getItemMeta();
         gMeta.displayName(Component.text("-").color(NamedTextColor.DARK_AQUA));
         glassPane.setItemMeta(gMeta);
@@ -93,17 +94,18 @@ public class WaystoneGUI implements InventoryHolder {
 
         List<String> pageDiscoveries = pDiscoveries.subList(start, end);
 
+        Location originLoc = wm.stringToLocation(originLocation);
+
         //Always renders the origin waystone at slot 4, regardless of page
         WaystoneYamlDTO originData = wm.getWaystones().get(originLocation);
         if (originData != null) {
             ItemStack originItem = new ItemStack(Material.LODESTONE);
             ItemMeta originMeta = originItem.getItemMeta();
-            Location originLoc = wm.stringToLocation(originLocation);
             List<Component> originLore = new ArrayList<>();
             originLore.add(Component.text(originLoc.getBlockX() + "," + originLoc.getBlockY() + "," + originLoc.getBlockZ()).color(NamedTextColor.GRAY));
             originLore.add(Component.text("You are here!").color(NamedTextColor.YELLOW));
             originMeta.lore(originLore);
-            originMeta.displayName(Component.text(originData.name()).color(NamedTextColor.BLUE));
+            originMeta.displayName(Component.text(originData.name()).color(TextColor.color(0xfce8f3)));
             originItem.setItemMeta(originMeta);
             inventory.setItem(4, originItem);
         }
@@ -126,11 +128,16 @@ public class WaystoneGUI implements InventoryHolder {
 
             //Add lore to item
             List<Component> lore = new ArrayList<>();
+            TextColor clrDim    = TextColor.color(0x3a2644);
+            TextColor clrMid    = TextColor.color(0x6e4a75);
+            TextColor clrLight  = TextColor.color(0xa889b9);
+            TextColor clrBright = TextColor.color(0xe7dde9);
+
             lore.add(Component.text(
                       waystoneLocation.getBlockX() +
                             "," + waystoneLocation.getBlockY() +
                             ","  + waystoneLocation.getBlockZ())
-                    .color(NamedTextColor.GRAY));
+                    .color(clrMid));
 
             String world = switch (waystoneLocation.getWorld().getName()) {
                 case "world" -> "Overworld";
@@ -139,7 +146,21 @@ public class WaystoneGUI implements InventoryHolder {
                 default -> "Unknown";
             };
 
-            lore.add(Component.text(world).color(NamedTextColor.GRAY));
+            lore.add(Component.text(world).color(clrMid));
+
+            if (originLoc.getWorld().equals(waystoneLocation.getWorld())) {
+                int dist = (int) Math.round(originLoc.distance(waystoneLocation));
+                lore.add(Component.text(dist + " blocks away").color(clrLight));
+                if (wm.isTeleportCostEnabled()) {
+                    int cost = wm.getTeleportCost(originLoc, waystoneLocation);
+                    lore.add(cost == 0
+                        ? Component.text("Free").color(clrDim)
+                        : Component.text("Cost: " + cost + " XP level(s)").color(clrBright));
+                }
+            } else {
+                lore.add(Component.text("Different dimension").color(clrDim));
+            }
+
             wMeta.lore(lore);
 
             //Glows connected waystones
@@ -152,7 +173,7 @@ public class WaystoneGUI implements InventoryHolder {
             wMeta.getPersistentDataContainer().set(WaystoneConstants.WAYSTONE_LOCATION_KEY, PersistentDataType.STRING, discover);
 
             //Sets the display name
-            wMeta.displayName(Component.text(waystoneData.name()).color(NamedTextColor.BLUE));
+            wMeta.displayName(Component.text(waystoneData.name()).color(TextColor.color(0xfce8f3)));
 
             //Apply changes
             waystoneItem.setItemMeta(wMeta);

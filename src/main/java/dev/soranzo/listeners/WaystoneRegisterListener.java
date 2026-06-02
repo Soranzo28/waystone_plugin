@@ -51,7 +51,7 @@ public class WaystoneRegisterListener implements Listener {
         if (!event.getPlayer().hasPermission("waystones.place")) {
             event.setCancelled(true);
             Player player = event.getPlayer();
-            player.sendMessage(Component.text("✦ You don't have permission to place waystones.")
+            player.sendActionBar(Component.text("✦ You don't have permission to place waystones.")
                     .color(TextColor.color(0xff6b6b)));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
@@ -75,7 +75,7 @@ public class WaystoneRegisterListener implements Listener {
             boolean isOwner = player.getUniqueId().equals(owner);
             if (!isOwner && !player.hasPermission("waystones.break")) {
                 event.setCancelled(true);
-                player.sendMessage(Component.text("✦ You are not the owner of this waystone.")
+                player.sendActionBar(Component.text("✦ You are not the owner of this waystone.")
                         .color(TextColor.color(0xff6b6b)));
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                 return;
@@ -98,7 +98,7 @@ public class WaystoneRegisterListener implements Listener {
             UUID attachedOwner = attachedWaystone != null ? attachedWaystone.owner() : null;
             if (!player.getUniqueId().equals(attachedOwner) && !player.hasPermission("waystones.break")) {
                 event.setCancelled(true);
-                player.sendMessage(Component.text("✦ You are not the owner of this waystone.")
+                player.sendActionBar(Component.text("✦ You are not the owner of this waystone.")
                         .color(TextColor.color(0xff6b6b)));
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                 return;
@@ -168,7 +168,7 @@ public class WaystoneRegisterListener implements Listener {
         boolean isOwner = player.getUniqueId().equals(owner);
         if (!isOwner && !player.hasPermission("waystones.break")) {
             event.setCancelled(true);
-            player.sendMessage(Component.text("✦ You are not the owner of this waystone.")
+            player.sendActionBar(Component.text("✦ You are not the owner of this waystone.")
                     .color(TextColor.color(0xff6b6b)));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
@@ -182,18 +182,18 @@ public class WaystoneRegisterListener implements Listener {
         Location attachedCenter = attached.getLocation().clone().add(0.5, 0.5, 0.5);
         attached.getLocation().getWorld().spawnParticle(Particle.CLOUD, attachedCenter, 30, 0.3, 0.4, 0.3, 0.05);
         if ("nameless".equals(oldName)) {
-            player.sendMessage(Component.text("✦ Waystone named: ")
-                    .color(TextColor.color(0x818cf8))
+            player.sendActionBar(Component.text("✦ Waystone named: ")
+                    .color(TextColor.color(0xe7dde9))
                     .append(Component.text(name)
                             .color(TextColor.color(0xffd700))
                             .decorate(TextDecoration.BOLD)));
         } else {
-            player.sendMessage(Component.text("✦ Waystone renamed: ")
-                    .color(TextColor.color(0x818cf8))
+            player.sendActionBar(Component.text("✦ Waystone renamed: ")
+                    .color(TextColor.color(0xe7dde9))
                     .append(Component.text(oldName)
                             .color(TextColor.color(0xffd700))
                             .decorate(TextDecoration.BOLD))
-                    .append(Component.text(" → ").color(TextColor.color(0x818cf8)))
+                    .append(Component.text(" → ").color(TextColor.color(0xe7dde9)))
                     .append(Component.text(name)
                             .color(TextColor.color(0xffd700))
                             .decorate(TextDecoration.BOLD)));
@@ -216,7 +216,7 @@ public class WaystoneRegisterListener implements Listener {
 
         if (!event.getPlayer().hasPermission("waystones.use")) {
             Player player = event.getPlayer();
-            player.sendMessage(Component.text("✦ You don't have permission to use waystones.")
+            player.sendActionBar(Component.text("✦ You don't have permission to use waystones.")
                     .color(TextColor.color(0xff6b6b)));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
@@ -224,8 +224,8 @@ public class WaystoneRegisterListener implements Listener {
 
         if (!wm.getWaystoneStatus(block.getLocation())) {
             Player player = event.getPlayer();
-            player.sendMessage(Component.text("✦ This waystone has not been named yet")
-                    .color(TextColor.color(0x818cf8)));
+            player.sendActionBar(Component.text("✦ This waystone has not been named yet")
+                    .color(TextColor.color(0xa889b9)));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
@@ -242,7 +242,7 @@ public class WaystoneRegisterListener implements Listener {
         Player player = event.getPlayer();
         String wsName = wm.getWaystones().get(wm.locationToString(block.getLocation())).name();
         player.sendActionBar(Component.text("✦ " + wsName + " — Choose your destination")
-                .color(TextColor.color(0x818cf8)));
+                .color(TextColor.color(0xa889b9)));
         player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_AMBIENT, 0.08f, 2.0f);
         block.getWorld().spawnParticle(Particle.END_ROD,
                 block.getLocation().clone().add(0.5, 1.2, 0.5), 12, 0.3, 0.4, 0.3, 0.05);
@@ -296,12 +296,12 @@ public class WaystoneRegisterListener implements Listener {
             WaystoneYamlDTO originData = wm.getWaystones().get(originLocationString);
             String originName = originData != null ? originData.name() : "?";
             String destName = waystoneData.name();
-            p.sendMessage(Component.text("✦ Destination set: ")
-                    .color(TextColor.color(0x818cf8))
+            p.sendActionBar(Component.text("✦ Destination set: ")
+                    .color(TextColor.color(0xe7dde9))
                     .append(Component.text(originName)
                             .color(TextColor.color(0xffd700))
                             .decorate(TextDecoration.BOLD))
-                    .append(Component.text(" → ").color(TextColor.color(0x818cf8)))
+                    .append(Component.text(" → ").color(TextColor.color(0xe7dde9)))
                     .append(Component.text(destName)
                             .color(TextColor.color(0xffd700))
                             .decorate(TextDecoration.BOLD)));
