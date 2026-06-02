@@ -8,16 +8,16 @@ A Paper plugin that brings a waystone system to vanilla Minecraft — inspired b
 
 <table>
   <tr>
-    <td align="center"><b>Place</b><br><img width="480" height="270" src="https://github.com/user-attachments/assets/52517f1b-2b86-4c4d-92d3-19424804268a" /></td>
-    <td align="center"><b>Naming</b><br><img width="480" height="270" src="https://github.com/user-attachments/assets/b5de5c34-2eef-4eb4-b225-f83c712cc90b" /></td>
+    <td align="center"><b>Place</b><br><img width="460" height="270" src="https://github.com/user-attachments/assets/52517f1b-2b86-4c4d-92d3-19424804268a" /></td>
+    <td align="center"><b>Naming</b><br><img width="460" height="270" src="https://github.com/user-attachments/assets/b5de5c34-2eef-4eb4-b225-f83c712cc90b" /></td>
   </tr>
   <tr>
-    <td align="center"><b>Discovering</b><br><img width="480" height="270" src="https://github.com/user-attachments/assets/23867891-15a1-483e-94bb-d42fff0f40f8" /></td>
-    <td align="center"><b>Teleport</b><br><img width="480" height="270" src="https://github.com/user-attachments/assets/defa329b-dd8e-4c6e-b907-805e332158ee" /></td>
+    <td align="center"><b>Discovering</b><br><img width="460" height="270" src="https://github.com/user-attachments/assets/23867891-15a1-483e-94bb-d42fff0f40f8" /></td>
+    <td align="center"><b>Teleport</b><br><img width="460" height="270" src="https://github.com/user-attachments/assets/defa329b-dd8e-4c6e-b907-805e332158ee" /></td>
   </tr>
   <tr>
-    <td align="center"><b>GUI</b><br><img width="480" height="270" src="https://github.com/user-attachments/assets/c1559bfb-5855-405a-a953-51494f6f6e7a" /></td>
-    <td align="center"><b>GUI — Select</b><br><img width="480" height="270" src="https://github.com/user-attachments/assets/c9a4ca48-e0a9-4825-b7c1-941c191fb099" /></td>
+    <td align="center"><b>GUI</b><br><img width="460" height="270" src="https://github.com/user-attachments/assets/c1559bfb-5855-405a-a953-51494f6f6e7a" /></td>
+    <td align="center"><b>GUI — Select</b><br><img width="460" height="270" src="https://github.com/user-attachments/assets/c9a4ca48-e0a9-4825-b7c1-941c191fb099" /></td>
   </tr>
 </table>
 
