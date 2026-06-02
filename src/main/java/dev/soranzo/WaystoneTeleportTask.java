@@ -46,6 +46,12 @@ public class WaystoneTeleportTask implements Runnable {
             if (connectionString.isEmpty()) continue;
             Location tpLocation = wm.stringToLocation(connectionString);
 
+            if (!wm.isCrossDimensionAllowed() && !tpLocation.getWorld().equals(player.getWorld())) {
+                player.sendActionBar(Component.text("✦ Cross-dimension travel is disabled.")
+                        .color(TextColor.color(0xff6b6b)));
+                continue;
+            }
+
             if (!standingOn.containsKey(player.getUniqueId())) {
                 standingOn.put(player.getUniqueId(), System.currentTimeMillis());
                 player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_AMBIENT, 0.4f, 1.6f);
@@ -58,6 +64,18 @@ public class WaystoneTeleportTask implements Runnable {
 
             tpLocation.add(0.5, 1, 0.5);
             Location originLoc = player.getLocation().clone();
+
+            if (wm.isTeleportCostEnabled()) {
+                int cost = wm.getTeleportCost(originLoc, tpLocation);
+                if (player.getLevel() < cost) {
+                    player.sendActionBar(Component.text("✦ Not enough XP — need " + cost + " level(s).")
+                            .color(TextColor.color(0xff6b6b)));
+                    standingOn.remove(player.getUniqueId());
+                    continue;
+                }
+                player.setLevel(player.getLevel() - cost);
+            }
+
             originLoc.getWorld().spawnParticle(Particle.PORTAL,
                     originLoc.clone().add(0, 0.5, 0), 60, 0.4, 0.8, 0.4, 0.2);
 

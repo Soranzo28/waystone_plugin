@@ -138,6 +138,21 @@ public class WaystoneManager {
         return plugin.getConfig().getLong("teleport-cooldown", 3) * 1000L;
     }
 
+    public boolean isCrossDimensionAllowed() {
+        return plugin.getConfig().getBoolean("cross-dimension", false);
+    }
+
+    public boolean isTeleportCostEnabled() {
+        return plugin.getConfig().getBoolean("teleport-cost-enabled", true);
+    }
+
+    public int getTeleportCost(Location from, Location to) {
+        if (!from.getWorld().equals(to.getWorld())) return 0;
+        int scale = plugin.getConfig().getInt("teleport-cost-scale", 100);
+        double distance = from.distance(to);
+        return (int) Math.sqrt(distance / scale);
+    }
+
     public boolean isOnCooldown(UUID uuid) {
         Long time = cooldowns.get(uuid);
         if (time == null) return false;
