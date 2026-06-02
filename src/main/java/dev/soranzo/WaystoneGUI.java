@@ -13,6 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
@@ -38,6 +39,19 @@ public class WaystoneGUI implements InventoryHolder {
             inventory.setItem(i, glassPane);
             inventory.setItem(53-i, glassPane);
         }
+
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+        skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer("patolheiro"));
+        skullMeta.displayName(Component.text("About").color(NamedTextColor.LIGHT_PURPLE));
+        skullMeta.lore(List.of(
+                Component.text("Made by -> Soranzo").color(NamedTextColor.GRAY),
+                Component.text("Github  -> @Soranzo28").color(NamedTextColor.GRAY),
+                Component.text("Discord -> soranzo28").color(NamedTextColor.GRAY)
+        ));
+        skullMeta.getPersistentDataContainer().set(WaystoneConstants.WAYSTONE_AUTHOR_KEY, PersistentDataType.BOOLEAN, true);
+        skull.setItemMeta(skullMeta);
+        inventory.setItem(49, skull);
 
 
         //Start slot to put waystones

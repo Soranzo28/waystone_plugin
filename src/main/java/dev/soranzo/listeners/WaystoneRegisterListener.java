@@ -315,19 +315,23 @@ public class WaystoneRegisterListener implements Listener {
             TextColor gold   = TextColor.color(0xffd700);
             TextColor white  = TextColor.color(0xffffff);
             TextColor gray   = TextColor.color(0xa0aec0);
-            String line = "======================";
-            p.sendMessage(Component.text("✦ " + line + " AUTOR " + line + " ✦").color(purple));
+            String line = "=================";
+            p.sendMessage(Component.text("✦ " + line + " AUTHOR " + line + " ✦").color(purple));
             p.sendMessage(
-                Component.text("  Nome    ").color(gray)
-                    .append(Component.text("Patolheiro").color(gold))
+                Component.text("  Name    ").color(gray)
+                    .append(Component.text("Soranzo").color(gold))
             );
             p.sendMessage(
-                Component.text("  Github  ").color(gray)
+                Component.text("  Github   ").color(gray)
                     .append(Component.text("github.com/Soranzo28").color(white)
                         .clickEvent(ClickEvent.openUrl("https://github.com/Soranzo28"))
                         .decorate(TextDecoration.UNDERLINED))
             );
-            p.sendMessage(Component.text("+ " + line + "===============" + line + " +").color(purple));
+            p.sendMessage(
+                Component.text("  Discord  ").color(gray)
+                    .append(Component.text("soranzo28").color(white))
+            );
+            p.sendMessage(Component.text("✦ " + line + "========" + line + " ✦").color(purple));
         }
         else if (isArrow) {
             Player p = (Player) event.getWhoClicked();
