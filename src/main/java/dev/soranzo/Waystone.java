@@ -1,12 +1,9 @@
 package dev.soranzo;
 
+import dev.soranzo.commands.WaystoneCommand;
 import dev.soranzo.listeners.WaystoneRegisterListener;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class Waystone extends JavaPlugin {
 
@@ -16,9 +13,13 @@ public class Waystone extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        saveDefaultConfig();
         WaystoneRecipe.register(this);
         getServer().getPluginManager().registerEvents(new WaystoneRegisterListener(this), this);
         Bukkit.getScheduler().runTaskTimer(this, new WaystoneTeleportTask(wm), 0L, 10L);
+        WaystoneCommand waystoneCommand = new WaystoneCommand(wm);
+        getCommand("waystone").setExecutor(waystoneCommand);
+        getCommand("waystone").setTabCompleter(waystoneCommand);
     }
 
     @Override

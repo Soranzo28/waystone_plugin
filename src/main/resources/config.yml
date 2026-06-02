@@ -1,0 +1,5 @@
+# Time in ticks the player must stand on a waystone before teleporting (1 tick = 50ms)
+standing-delay: 10
+
+# Cooldown in seconds before the player can teleport again
+teleport-cooldown: 3
