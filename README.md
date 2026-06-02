@@ -96,9 +96,9 @@ Attach a **wall sign** to the Waystone and write its name on the first line. The
 
 Right-click a discovered waystone to open your personal GUI. Select any other discovered waystone to set it as your destination for that origin point.
 
-- 🟡 **Gold** — the waystone you're currently at
-- 🟢 **Green (glowing)** — your currently configured destination
-- ⚪ **White** — other available waystones
+- Upper waystone: Where you are at.
+- Glowing waystone: Selected destination.
+- Other waystones: Other waystones.
 
 ---
 
