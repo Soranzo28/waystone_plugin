@@ -5,10 +5,14 @@ standing-delay: 10
 teleport-cooldown: 3
 
 # Allow teleporting between different dimensions (Overworld, Nether, End)
-cross-dimension: false
+cross-dimension: true
 
 # Charge XP levels to teleport (cost grows with distance using sqrt formula)
 teleport-cost-enabled: true
+
 # Divides distance before sqrt — higher value = cheaper teleports
 # cost = floor(sqrt(distance / scale)) — e.g. scale 100: 400 blocks = 2 levels
 teleport-cost-scale: 100
+
+# Fixed XP level cost for cross-dimension teleports
+cross-dimension-cost: 5

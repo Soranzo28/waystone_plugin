@@ -14,6 +14,8 @@ public class Waystone extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
         WaystoneRecipe.register(this);
         getServer().getPluginManager().registerEvents(new WaystoneRegisterListener(this), this);
         Bukkit.getScheduler().runTaskTimer(this, new WaystoneTeleportTask(wm), 0L, 10L);

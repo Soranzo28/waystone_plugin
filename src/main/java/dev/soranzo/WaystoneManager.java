@@ -147,7 +147,9 @@ public class WaystoneManager {
     }
 
     public int getTeleportCost(Location from, Location to) {
-        if (!from.getWorld().equals(to.getWorld())) return 0;
+        if (!from.getWorld().equals(to.getWorld())) {
+            return plugin.getConfig().getInt("cross-dimension-cost", 5);
+        }
         int scale = plugin.getConfig().getInt("teleport-cost-scale", 100);
         double distance = from.distance(to);
         return (int) Math.sqrt(distance / scale);
