@@ -86,6 +86,8 @@ public class WaystoneRegisterListener implements Listener {
             loc.getWorld().spawnParticle(Particle.SMOKE, loc.clone().add(0.5, 0.5, 0.5), 30, 0.3, 0.3, 0.3, 0.05);
             loc.getWorld().spawnParticle(Particle.LARGE_SMOKE, loc.clone().add(0.5, 0.5, 0.5), 8, 0.3, 0.3, 0.3, 0.0);
 
+            event.setDropItems(false);
+            loc.getWorld().dropItemNaturally(loc, WaystoneRecipe.getWaystoneItem(pl));
             wm.unregisterWaystone(event.getBlock().getLocation());
         } else if (event.getBlock().getBlockData() instanceof WallSign wallSign) {
             Block signBlock = event.getBlock();
