@@ -175,8 +175,8 @@ public class WaystoneRegisterListener implements Listener {
         }
 
         if (name == null) return;
-
-        wm.setWaystoneName(attached.getLocation(), name);
+        String trimmed_name = name.trim();
+        wm.setWaystoneName(attached.getLocation(), trimmed_name);
         wm.setWaystoneActive(attached.getLocation());
 
         Location attachedCenter = attached.getLocation().clone().add(0.5, 0.5, 0.5);
