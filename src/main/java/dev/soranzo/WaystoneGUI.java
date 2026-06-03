@@ -105,7 +105,7 @@ public class WaystoneGUI implements InventoryHolder {
             originLore.add(Component.text(originLoc.getBlockX() + "," + originLoc.getBlockY() + "," + originLoc.getBlockZ()).color(NamedTextColor.GRAY));
             originLore.add(Component.text("You are here!").color(NamedTextColor.YELLOW));
             originMeta.lore(originLore);
-            originMeta.displayName(Component.text(originData.name()).color(TextColor.color(0xfce8f3)));
+            originMeta.displayName(Component.text(originData.name()).color(NamedTextColor.LIGHT_PURPLE));
             originItem.setItemMeta(originMeta);
             inventory.setItem(4, originItem);
         }
@@ -128,10 +128,11 @@ public class WaystoneGUI implements InventoryHolder {
 
             //Add lore to item
             List<Component> lore = new ArrayList<>();
-            TextColor clrDim    = TextColor.color(0x3a2644);
-            TextColor clrMid    = TextColor.color(0x6e4a75);
-            TextColor clrLight  = TextColor.color(0xa889b9);
-            TextColor clrBright = TextColor.color(0xe7dde9);
+            TextColor clrDifDim    = NamedTextColor.DARK_RED;
+            TextColor clrMid    = NamedTextColor.GRAY;
+            TextColor clrLight  = NamedTextColor.GRAY;
+            TextColor clrXp = TextColor.color(0x89f336);
+            TextColor clrFree = NamedTextColor.BLUE;
 
             lore.add(Component.text(
                       waystoneLocation.getBlockX() +
@@ -154,11 +155,17 @@ public class WaystoneGUI implements InventoryHolder {
                 if (wm.isTeleportCostEnabled()) {
                     int cost = wm.getTeleportCost(originLoc, waystoneLocation);
                     lore.add(cost == 0
-                        ? Component.text("Free").color(clrDim)
-                        : Component.text("Cost: " + cost + " XP level(s)").color(clrBright));
+                        ? Component.text("Free").color(clrFree)
+                        : Component.text( cost + " XP level(s)").color(clrXp));
                 }
             } else {
-                lore.add(Component.text("Different dimension").color(clrDim));
+                lore.add(Component.text("Different dimension").color(clrDifDim));
+                if (wm.isTeleportCostEnabled()) {
+                    int cost = wm.getTeleportCost(originLoc, waystoneLocation);
+                    lore.add(cost == 0
+                        ? Component.text("Free").color(clrFree)
+                        : Component.text(cost + " XP level(s)").color(clrXp));
+                }
             }
 
             wMeta.lore(lore);
@@ -173,7 +180,7 @@ public class WaystoneGUI implements InventoryHolder {
             wMeta.getPersistentDataContainer().set(WaystoneConstants.WAYSTONE_LOCATION_KEY, PersistentDataType.STRING, discover);
 
             //Sets the display name
-            wMeta.displayName(Component.text(waystoneData.name()).color(TextColor.color(0xfce8f3)));
+            wMeta.displayName(Component.text(waystoneData.name()).color(NamedTextColor.LIGHT_PURPLE));
 
             //Apply changes
             waystoneItem.setItemMeta(wMeta);

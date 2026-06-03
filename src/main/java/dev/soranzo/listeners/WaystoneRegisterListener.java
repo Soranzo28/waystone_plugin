@@ -183,20 +183,17 @@ public class WaystoneRegisterListener implements Listener {
         attached.getLocation().getWorld().spawnParticle(Particle.CLOUD, attachedCenter, 30, 0.3, 0.4, 0.3, 0.05);
         if ("nameless".equals(oldName)) {
             player.sendActionBar(Component.text("✦ Waystone named: ")
-                    .color(TextColor.color(0xe7dde9))
+                    .color(NamedTextColor.GRAY)
                     .append(Component.text(name)
-                            .color(TextColor.color(0xffd700))
-                            .decorate(TextDecoration.BOLD)));
+                            .color(NamedTextColor.LIGHT_PURPLE)));
         } else {
             player.sendActionBar(Component.text("✦ Waystone renamed: ")
-                    .color(TextColor.color(0xe7dde9))
+                    .color(NamedTextColor.GRAY)
                     .append(Component.text(oldName)
-                            .color(TextColor.color(0xffd700))
-                            .decorate(TextDecoration.BOLD))
-                    .append(Component.text(" → ").color(TextColor.color(0xe7dde9)))
+                            .color(NamedTextColor.LIGHT_PURPLE))
+                    .append(Component.text(" → ").color(NamedTextColor.GRAY))
                     .append(Component.text(name)
-                            .color(TextColor.color(0xffd700))
-                            .decorate(TextDecoration.BOLD)));
+                            .color(NamedTextColor.LIGHT_PURPLE)));
         }
     }
 
@@ -225,7 +222,7 @@ public class WaystoneRegisterListener implements Listener {
         if (!wm.getWaystoneStatus(block.getLocation())) {
             Player player = event.getPlayer();
             player.sendActionBar(Component.text("✦ This waystone has not been named yet")
-                    .color(TextColor.color(0xa889b9)));
+                    .color(NamedTextColor.GRAY));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
@@ -242,7 +239,7 @@ public class WaystoneRegisterListener implements Listener {
         Player player = event.getPlayer();
         String wsName = wm.getWaystones().get(wm.locationToString(block.getLocation())).name();
         player.sendActionBar(Component.text("✦ " + wsName + " — Choose your destination")
-                .color(TextColor.color(0xa889b9)));
+                .color(NamedTextColor.GRAY));
         player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_AMBIENT, 0.08f, 2.0f);
         block.getWorld().spawnParticle(Particle.END_ROD,
                 block.getLocation().clone().add(0.5, 1.2, 0.5), 12, 0.3, 0.4, 0.3, 0.05);
@@ -297,14 +294,12 @@ public class WaystoneRegisterListener implements Listener {
             String originName = originData != null ? originData.name() : "?";
             String destName = waystoneData.name();
             p.sendActionBar(Component.text("✦ Destination set: ")
-                    .color(TextColor.color(0xe7dde9))
+                    .color(NamedTextColor.GRAY)
                     .append(Component.text(originName)
-                            .color(TextColor.color(0xffd700))
-                            .decorate(TextDecoration.BOLD))
-                    .append(Component.text(" → ").color(TextColor.color(0xe7dde9)))
+                            .color(NamedTextColor.LIGHT_PURPLE))
+                    .append(Component.text(" → ").color(NamedTextColor.GRAY))
                     .append(Component.text(destName)
-                            .color(TextColor.color(0xffd700))
-                            .decorate(TextDecoration.BOLD)));
+                            .color(NamedTextColor.LIGHT_PURPLE)));
             p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.5f);
             p.closeInventory();
         }

@@ -3,6 +3,7 @@ package dev.soranzo;
 import dev.soranzo.dto.PlayerYamlDTO;
 import dev.soranzo.dto.WaystoneYamlDTO;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
@@ -85,8 +86,8 @@ public class WaystoneTeleportTask implements Runnable {
             WaystoneYamlDTO destData = wm.getWaystones().get(connectionString);
             String destName = destData != null ? destData.name() : "Waystone";
             Title title = Title.title(
-                    Component.text("✦ Waystone ✦").color(TextColor.color(0xffd700)),
-                    Component.text(destName).color(TextColor.color(0xa78bfa)),
+                    Component.text("✦ Waystone ✦").color(NamedTextColor.GRAY),
+                    Component.text(destName).color(NamedTextColor.LIGHT_PURPLE),
                     Title.Times.times(Duration.ofMillis(100), Duration.ofMillis(1000), Duration.ofMillis(300))
             );
             player.showTitle(title);
