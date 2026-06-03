@@ -2,6 +2,7 @@ package dev.soranzo.listeners;
 
 import dev.soranzo.*;
 import dev.soranzo.dto.WaystoneYamlDTO;
+import dev.soranzo.gui.WaystoneGUI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -245,6 +246,9 @@ public class WaystoneRegisterListener implements Listener {
                 block.getLocation().clone().add(0.5, 1.2, 0.5), 12, 0.3, 0.4, 0.3, 0.05);
 
         String originLocation = wm.locationToString(block.getLocation());
+        if (!wm.getDiscoveries().containsKey(player.getUniqueId())) {
+            wm.ensureGlobalsDiscovered(player.getUniqueId());
+        }
         player.openInventory(new WaystoneGUI(player, wm, originLocation, 0).getInventory());
     }
 

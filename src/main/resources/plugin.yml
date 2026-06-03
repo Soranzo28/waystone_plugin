@@ -7,7 +7,7 @@ authors: [soranzo]
 commands:
   waystone:
     description: Waystone admin commands
-    usage: /waystone <list|delete <name>|reload>
+    usage: /waystone <list|delete <name>|reload|global <add|remove>|admin|give <player>>
     permission: waystones.admin
 permissions:
   waystones.use:

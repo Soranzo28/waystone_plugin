@@ -8,4 +8,6 @@ public class WaystoneConstants {
     public static final NamespacedKey IS_WAYSTONE_KEY = new NamespacedKey(instance, "is_waystone");
     public static final NamespacedKey WAYSTONE_PAGE_KEY = new NamespacedKey(instance, "waystone_page");
     public static final NamespacedKey WAYSTONE_AUTHOR_KEY = new NamespacedKey(instance, "waystone_author");
+    public static final NamespacedKey ADMIN_FILTER_KEY   = new NamespacedKey(instance, "admin_filter");
+    public static final NamespacedKey ADMIN_ACTION_KEY   = new NamespacedKey(instance, "admin_action");
 }

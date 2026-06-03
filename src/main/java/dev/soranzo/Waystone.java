@@ -1,6 +1,7 @@
 package dev.soranzo;
 
 import dev.soranzo.commands.WaystoneCommand;
+import dev.soranzo.listeners.AdminGUIListener;
 import dev.soranzo.listeners.WaystoneRegisterListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,6 +19,7 @@ public class Waystone extends JavaPlugin {
         saveConfig();
         WaystoneRecipe.register(this);
         getServer().getPluginManager().registerEvents(new WaystoneRegisterListener(this), this);
+        getServer().getPluginManager().registerEvents(new AdminGUIListener(wm), this);
         Bukkit.getScheduler().runTaskTimer(this, new WaystoneTeleportTask(wm), 0L, 10L);
         WaystoneCommand waystoneCommand = new WaystoneCommand(wm);
         getCommand("waystone").setExecutor(waystoneCommand);

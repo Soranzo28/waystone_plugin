@@ -6,6 +6,7 @@ public record WaystoneYamlDTO(
     String stringLocation,
     String name,
     boolean active,
-    UUID owner
+    UUID owner,
+    boolean global
 ) {
 }

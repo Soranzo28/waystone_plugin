@@ -20,6 +20,7 @@ public class WaystoneManager {
 
     private final HashMap<String, WaystoneYamlDTO> waystonesInfo = new HashMap<>();
     private final HashMap<UUID, PlayerYamlDTO> playerInfo = new HashMap<>();
+    private final HashSet<String> globalWaystones = new HashSet<>();
 
     public WaystoneManager(Waystone plugin) {
        this.plugin = plugin;
@@ -53,6 +54,7 @@ public class WaystoneManager {
         data = YamlConfiguration.loadConfiguration(file);
         waystonesInfo.clear();
         playerInfo.clear();
+        globalWaystones.clear();
         populateWaystones();
         populateDiscoveries();
     }
@@ -67,8 +69,10 @@ public class WaystoneManager {
             boolean active = data.getBoolean("waystones." + key + ".active");
             String ownerStr = data.getString("waystones." + key + ".owner");
             UUID owner = ownerStr != null ? UUID.fromString(ownerStr) : null;
+            boolean global = data.getBoolean("waystones." + key + ".global", false);
+            if (global) globalWaystones.add(key);
 
-            waystonesInfo.put(key, new WaystoneYamlDTO(key, name, active, owner));
+            waystonesInfo.put(key, new WaystoneYamlDTO(key, name, active, owner, global));
         }
     }
 
@@ -183,13 +187,14 @@ public class WaystoneManager {
         data.set("waystones." + locationToString(location) + ".owner", playerUUID.toString());
         saveDataFile();
 
-        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, false, playerUUID));
+        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, false, playerUUID, false));
     }
 
     public void unregisterWaystone(Location location) {
         data.set("waystones." + locationToString(location), null);
 
         waystonesInfo.remove(locationToString(location));
+        globalWaystones.remove(locationToString(location));
 
         for (PlayerYamlDTO player : playerInfo.values()) {
 
@@ -246,7 +251,7 @@ public class WaystoneManager {
 
         WaystoneYamlDTO old = waystonesInfo.get(locationToString(location));
         if (old == null) return;
-        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), old.name(), true, old.owner()));
+        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), old.name(), true, old.owner(), old.global()));
     }
 
     public void setWaystoneInactive(Location location) {
@@ -255,7 +260,33 @@ public class WaystoneManager {
 
         WaystoneYamlDTO old = waystonesInfo.get(locationToString(location));
         if (old == null) return;
-        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), old.name(), false, old.owner()));
+        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), old.name(), false, old.owner(), old.global()));
+    }
+
+    public void setWaystoneGlobal(Location location, boolean global) {
+        String key = locationToString(location);
+        data.set("waystones." + key + ".global", global);
+        saveDataFile();
+        if (global) {
+            globalWaystones.add(key);
+            for (UUID uuid : playerInfo.keySet()) {
+                registerNewDiscover(location, uuid);
+            }
+        } else {
+            globalWaystones.remove(key);
+        }
+        WaystoneYamlDTO old = waystonesInfo.get(key);
+        if (old == null) return;
+        waystonesInfo.put(key, new WaystoneYamlDTO(key, old.name(), old.active(), old.owner(), global));
+    }
+
+    public void ensureGlobalsDiscovered(UUID playerUUID) {
+        for (String key : globalWaystones) {
+            WaystoneYamlDTO ws = waystonesInfo.get(key);
+            if (ws != null && ws.active()) {
+                registerNewDiscover(stringToLocation(key), playerUUID);
+            }
+        }
     }
 
     public void setWaystoneName(Location location, String name) {
@@ -263,7 +294,7 @@ public class WaystoneManager {
         saveDataFile();
         WaystoneYamlDTO old = waystonesInfo.get(locationToString(location));
         if (old == null) return;
-        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, old.active(), old.owner()));
+        waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, old.active(), old.owner(), old.global()));
 
     }
 }

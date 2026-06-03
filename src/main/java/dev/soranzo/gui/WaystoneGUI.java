@@ -1,5 +1,7 @@
-package dev.soranzo;
+package dev.soranzo.gui;
 
+import dev.soranzo.WaystoneConstants;
+import dev.soranzo.WaystoneManager;
 import dev.soranzo.dto.PlayerYamlDTO;
 import dev.soranzo.dto.WaystoneYamlDTO;
 import net.kyori.adventure.text.Component;
@@ -8,7 +10,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -31,9 +32,9 @@ public class WaystoneGUI implements InventoryHolder {
         this.originLocation = originLocation;
 
         //Static itens for decoration
-        ItemStack glassPane = new ItemStack(Material.CYAN_STAINED_GLASS_PANE);
+        ItemStack glassPane = new ItemStack(Material.PURPLE_STAINED_GLASS_PANE);
         ItemMeta gMeta = glassPane.getItemMeta();
-        gMeta.displayName(Component.text("-").color(NamedTextColor.DARK_AQUA));
+        gMeta.displayName(Component.text(" ").color(NamedTextColor.DARK_AQUA));
         glassPane.setItemMeta(gMeta);
 
         for (int i = 0; i < 9; i++) {
@@ -44,7 +45,7 @@ public class WaystoneGUI implements InventoryHolder {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
         skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer("patolheiro"));
-        skullMeta.displayName(Component.text("About").color(NamedTextColor.LIGHT_PURPLE));
+        skullMeta.displayName(Component.text("About").color(NamedTextColor.DARK_PURPLE));
         skullMeta.lore(List.of(
                 Component.text("Made by -> Soranzo").color(NamedTextColor.GRAY),
                 Component.text("Github  -> @Soranzo28").color(NamedTextColor.GRAY),
@@ -105,7 +106,7 @@ public class WaystoneGUI implements InventoryHolder {
             originLore.add(Component.text(originLoc.getBlockX() + "," + originLoc.getBlockY() + "," + originLoc.getBlockZ()).color(NamedTextColor.GRAY));
             originLore.add(Component.text("You are here!").color(NamedTextColor.YELLOW));
             originMeta.lore(originLore);
-            originMeta.displayName(Component.text(originData.name()).color(NamedTextColor.LIGHT_PURPLE));
+            originMeta.displayName(Component.text(originData.name()).color(NamedTextColor.DARK_PURPLE));
             originItem.setItemMeta(originMeta);
             inventory.setItem(4, originItem);
         }
@@ -128,11 +129,9 @@ public class WaystoneGUI implements InventoryHolder {
 
             //Add lore to item
             List<Component> lore = new ArrayList<>();
-            TextColor clrDifDim    = NamedTextColor.DARK_RED;
             TextColor clrMid    = NamedTextColor.GRAY;
             TextColor clrLight  = NamedTextColor.GRAY;
             TextColor clrXp = TextColor.color(0x89f336);
-            TextColor clrFree = NamedTextColor.BLUE;
 
             lore.add(Component.text(
                       waystoneLocation.getBlockX() +
@@ -155,16 +154,16 @@ public class WaystoneGUI implements InventoryHolder {
                 if (wm.isTeleportCostEnabled()) {
                     int cost = wm.getTeleportCost(originLoc, waystoneLocation);
                     lore.add(cost == 0
-                        ? Component.text("Free").color(clrFree)
+                        ? Component.text("Free").color(clrXp)
                         : Component.text( cost + " XP level(s)").color(clrXp));
                 }
             } else {
-                lore.add(Component.text("Different dimension").color(clrDifDim));
+                lore.add(Component.text("Different dimension").color(clrLight));
                 if (wm.isTeleportCostEnabled()) {
                     int cost = wm.getTeleportCost(originLoc, waystoneLocation);
                     lore.add(cost == 0
-                        ? Component.text("Free").color(clrFree)
-                        : Component.text(cost + " XP level(s)").color(clrXp));
+                        ? Component.text("Free").color(clrXp)
+                        : Component.text(cost + " XP").color(clrXp));
                 }
             }
 
@@ -180,7 +179,7 @@ public class WaystoneGUI implements InventoryHolder {
             wMeta.getPersistentDataContainer().set(WaystoneConstants.WAYSTONE_LOCATION_KEY, PersistentDataType.STRING, discover);
 
             //Sets the display name
-            wMeta.displayName(Component.text(waystoneData.name()).color(NamedTextColor.LIGHT_PURPLE));
+            wMeta.displayName(Component.text(waystoneData.name()).color(NamedTextColor.DARK_PURPLE));
 
             //Apply changes
             waystoneItem.setItemMeta(wMeta);
