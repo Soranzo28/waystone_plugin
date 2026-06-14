@@ -295,6 +295,5 @@ public class WaystoneManager {
         WaystoneYamlDTO old = waystonesInfo.get(locationToString(location));
         if (old == null) return;
         waystonesInfo.put(locationToString(location), new WaystoneYamlDTO(locationToString(location), name, old.active(), old.owner(), old.global()));
-
     }
 }

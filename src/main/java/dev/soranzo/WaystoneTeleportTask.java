@@ -38,6 +38,12 @@ public class WaystoneTeleportTask implements Runnable {
             if (!wm.isThisBlockWaystone(blockBelow.getLocation())) continue;
             if (!player.hasPermission("waystones.use")) continue;
             if (wm.isOnCooldown(player.getUniqueId())) continue;
+            if (!wm.getWaystoneStatus(blockBelow.getLocation())) {
+                standingOn.remove(player.getUniqueId());
+                player.sendActionBar(Component.text("✦ This waystone is not active.")
+                        .color(TextColor.color(0xff6b6b)));
+                continue;
+            }
 
             PlayerYamlDTO pInfo = wm.getDiscoveries().get(player.getUniqueId());
             if (pInfo == null) continue;
@@ -46,6 +52,13 @@ public class WaystoneTeleportTask implements Runnable {
             String connectionString = pInfo.connections().getOrDefault(blockBelowLocationString, "");
             if (connectionString.isEmpty()) continue;
             Location tpLocation = wm.stringToLocation(connectionString);
+
+            if (!wm.getWaystoneStatus(tpLocation)) {
+                standingOn.remove(player.getUniqueId());
+                player.sendActionBar(Component.text("✦ The destination waystone is not active.")
+                        .color(TextColor.color(0xff6b6b)));
+                continue;
+            }
 
             if (!wm.isCrossDimensionAllowed() && !tpLocation.getWorld().equals(player.getWorld())) {
                 player.sendActionBar(Component.text("✦ Cross-dimension travel is disabled.")
