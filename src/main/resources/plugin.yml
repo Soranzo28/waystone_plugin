@@ -1,5 +1,5 @@
 name: Waystones
-version: 1.0-SNAPSHOT
+version: 2.0.0
 main: dev.soranzo.Waystone
 api-version: '26.1.2'
 description: Waystone system inspired by the Waystones mod.
