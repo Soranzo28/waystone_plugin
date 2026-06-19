@@ -5,4 +5,5 @@ target/
 .idea/
 waystones.yml
 deploy.sh
-TODO.md
+
+todo.md
