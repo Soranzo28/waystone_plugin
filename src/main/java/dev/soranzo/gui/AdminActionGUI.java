@@ -4,6 +4,7 @@ import dev.soranzo.WaystoneConstants;
 import dev.soranzo.WaystoneManager;
 import dev.soranzo.dto.WaystoneYamlDTO;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,7 +42,7 @@ public class AdminActionGUI implements InventoryHolder {
 
         inventory = Bukkit.createInventory(this, 27, Component.text(ws.name()).color(NAME));
 
-        ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemStack glass = new ItemStack(Material.PURPLE_STAINED_GLASS_PANE);
         ItemMeta glassMeta = glass.getItemMeta();
         glassMeta.displayName(Component.text(" "));
         glass.setItemMeta(glassMeta);
@@ -60,21 +61,21 @@ public class AdminActionGUI implements InventoryHolder {
     private ItemStack buildInfoItem(WaystoneYamlDTO ws, WaystoneManager wm) {
         ItemStack item = new ItemStack(Material.LODESTONE);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text(ws.name()).color(NAME));
+        meta.displayName(Component.text(ws.name()).color(NamedTextColor.DARK_PURPLE));
 
         List<Component> lore = new ArrayList<>();
         Location loc = wm.stringToLocation(ws.stringLocation());
         String world = AdminGUI.formatWorld(loc.getWorld().getName());
-        lore.add(Component.text(world + "  " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ()).color(MID));
+        lore.add(Component.text(world + "  " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ()).color(NamedTextColor.GRAY));
 
         String ownerName = "no owner";
         if (ws.owner() != null) {
             String n = Bukkit.getOfflinePlayer(ws.owner()).getName();
             ownerName = n != null ? n : ws.owner().toString();
         }
-        lore.add(Component.text("Owner: " + ownerName).color(MID));
-        lore.add(Component.text(ws.active() ? "Active" : "Inactive").color(ws.active() ? LIGHT : DIM));
-        if (ws.global()) lore.add(Component.text("✦ Global").color(BRIGHT));
+        lore.add(Component.text("Owner: " + ownerName).color(NamedTextColor.GRAY));
+        lore.add(Component.text(ws.active() ? "Active" : "Inactive").color(ws.active() ? NamedTextColor.GREEN : NamedTextColor.DARK_GRAY));
+        if (ws.global()) lore.add(Component.text("✦ Global").color(NamedTextColor.YELLOW));
         meta.lore(lore);
         item.setItemMeta(meta);
         return item;

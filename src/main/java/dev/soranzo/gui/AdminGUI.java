@@ -4,7 +4,9 @@ import dev.soranzo.WaystoneConstants;
 import dev.soranzo.WaystoneManager;
 import dev.soranzo.dto.WaystoneYamlDTO;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +42,7 @@ public class AdminGUI implements InventoryHolder {
 
         inventory = Bukkit.createInventory(this, 54, buildTitle(dimensionFilter, ownerFilter));
 
-        ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemStack glass = new ItemStack(Material.PURPLE_STAINED_GLASS_PANE);
         ItemMeta glassMeta = glass.getItemMeta();
         glassMeta.displayName(Component.text(" "));
         glass.setItemMeta(glassMeta);
@@ -65,7 +67,7 @@ public class AdminGUI implements InventoryHolder {
         if (page > 0) {
             ItemStack prev = new ItemStack(Material.ARROW);
             ItemMeta prevMeta = prev.getItemMeta();
-            prevMeta.displayName(Component.text("← Previous").color(BRIGHT));
+            prevMeta.displayName(Component.text("← Previous").color(NamedTextColor.YELLOW));
             prevMeta.getPersistentDataContainer().set(WaystoneConstants.WAYSTONE_PAGE_KEY, PersistentDataType.INTEGER, page - 1);
             prev.setItemMeta(prevMeta);
             inventory.setItem(45, prev);
@@ -74,7 +76,7 @@ public class AdminGUI implements InventoryHolder {
         if (page < totalPages - 1) {
             ItemStack next = new ItemStack(Material.ARROW);
             ItemMeta nextMeta = next.getItemMeta();
-            nextMeta.displayName(Component.text("Next →").color(BRIGHT));
+            nextMeta.displayName(Component.text("Next →").color(NamedTextColor.YELLOW));
             nextMeta.getPersistentDataContainer().set(WaystoneConstants.WAYSTONE_PAGE_KEY, PersistentDataType.INTEGER, page + 1);
             next.setItemMeta(nextMeta);
             inventory.setItem(53, next);
@@ -95,13 +97,16 @@ public class AdminGUI implements InventoryHolder {
     }
 
     private Component buildTitle(String dimensionFilter, UUID ownerFilter) {
-        if (dimensionFilter != null)
-            return Component.text("Admin ✦ " + formatWorld(dimensionFilter)).color(BRIGHT);
-        if (ownerFilter != null) {
+        String text;
+        if (dimensionFilter != null) {
+            text = "Admin ✦ " + formatWorld(dimensionFilter);
+        } else if (ownerFilter != null) {
             String name = Bukkit.getOfflinePlayer(ownerFilter).getName();
-            return Component.text("Admin ✦ " + (name != null ? name : "Unknown")).color(BRIGHT);
+            text = "Admin ✦ " + (name != null ? name : "Unknown");
+        } else {
+            text = "Admin ✦ Waystones";
         }
-        return Component.text("Admin ✦ Waystones").color(BRIGHT);
+        return MiniMessage.miniMessage().deserialize("<rainbow>" + text + "</rainbow>");
     }
 
     private ItemStack buildFilterItem(String dimensionFilter, UUID ownerFilter) {
@@ -129,9 +134,9 @@ public class AdminGUI implements InventoryHolder {
         }
 
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text(label).color(LIGHT));
+        meta.displayName(Component.text(label).color(NamedTextColor.YELLOW));
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("Click to change filter").color(MID));
+        lore.add(Component.text("Click to change filter").color(NamedTextColor.GRAY));
         meta.lore(lore);
         meta.getPersistentDataContainer().set(WaystoneConstants.ADMIN_FILTER_KEY, PersistentDataType.STRING, "open");
         item.setItemMeta(meta);
@@ -142,20 +147,20 @@ public class AdminGUI implements InventoryHolder {
         ItemStack item = new ItemStack(Material.LODESTONE);
         ItemMeta meta = item.getItemMeta();
 
-        meta.displayName(Component.text(ws.name()).color(NAME));
+        meta.displayName(Component.text(ws.name()).color(NamedTextColor.DARK_PURPLE));
 
         List<Component> lore = new ArrayList<>();
         Location loc = wm.stringToLocation(ws.stringLocation());
-        lore.add(Component.text(formatWorld(loc.getWorld().getName()) + "  " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ()).color(MID));
+        lore.add(Component.text(formatWorld(loc.getWorld().getName()) + "  " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ()).color(NamedTextColor.GRAY));
 
         String ownerName = "no owner";
         if (ws.owner() != null) {
             String n = Bukkit.getOfflinePlayer(ws.owner()).getName();
             ownerName = n != null ? n : ws.owner().toString();
         }
-        lore.add(Component.text("Owner: " + ownerName).color(MID));
-        lore.add(Component.text(ws.active() ? "Active" : "Inactive").color(ws.active() ? LIGHT : DIM));
-        if (ws.global()) lore.add(Component.text("✦ Global").color(BRIGHT));
+        lore.add(Component.text("Owner: " + ownerName).color(NamedTextColor.GRAY));
+        lore.add(Component.text(ws.active() ? "Active" : "Inactive").color(ws.active() ? NamedTextColor.GREEN : NamedTextColor.DARK_GRAY));
+        if (ws.global()) lore.add(Component.text("✦ Global").color(NamedTextColor.YELLOW));
 
         meta.lore(lore);
         meta.getPersistentDataContainer().set(WaystoneConstants.WAYSTONE_LOCATION_KEY, PersistentDataType.STRING, ws.stringLocation());
