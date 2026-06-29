@@ -28,9 +28,9 @@ Craft a special Lodestone, place and name it, discover other Waystones, and conn
 - Per-player discovery lists
 - Per-player origin-to-destination connections
 - Paginated destination selection GUI
-- Configurable teleport delay and cooldown
-- Optional XP level costs based on distance
-- Optional cross-dimension travel with a separate fixed cost
+- Configurable teleport delay; re-teleport blocked until the player steps off the waystone
+- Optional XP point costs displayed as fractional levels, scaled by distance
+- Optional cross-dimension travel with separate fixed fees for Nether and End
 - Global Waystones managed by administrators
 - Owner protection for blocks and attached signs
 - Safe custom-item drops when Waystones are broken or destroyed by explosions
@@ -125,33 +125,38 @@ Selecting an entry stores a personal connection from the current origin to that 
 Stand on a Waystone that has a destination configured for your player. After the configured delay, the plugin:
 
 1. Checks the cross-dimension setting.
-2. Calculates and validates the XP level cost.
-3. Removes the required levels.
+2. Calculates and validates the XP point cost.
+3. Deducts the required raw XP points (shown as fractional levels in the GUI).
 4. Teleports the player one block above the destination.
-5. Starts the teleport cooldown.
+5. Blocks the player from re-triggering the same waystone until they step off it.
 
 The teleport task checks online players every 10 server ticks.
 
 ## Teleport Costs
 
-XP costs use whole experience levels, not raw experience points.
+XP costs use raw experience points internally, then display as **fractional levels** in the GUI. The exact level drop depends on the player's current level (XP per level grows as levels increase, so high-level players pay proportionally less).
 
 For destinations in the same world:
 
 ```text
-cost = floor(sqrt(distance / teleport-cost-scale))
+cost (XP points) = floor(distance / teleport-cost-scale)
 ```
 
-With the default scale of `100`:
+With the default scale of `20`:
 
-| Distance | Cost |
-| ---: | ---: |
-| 99 blocks or less | 0 levels |
-| 100 blocks | 1 level |
-| 400 blocks | 2 levels |
-| 900 blocks | 3 levels |
+| Distance | XP Points | Approx. at level 0–5 |
+| ---: | ---: | ---: |
+| 200 blocks | 10 XP | ~0.7 levels |
+| 500 blocks | 25 XP | ~1.7 levels |
+| 1 000 blocks | 50 XP | ~3.4 levels |
+| 2 000 blocks | 100 XP | ~5.7 levels |
 
-Cross-dimension travel uses the fixed `cross-dimension-cost` value instead of the distance formula.
+Cross-dimension travel adds a fixed fee on top of the distance cost:
+
+| Destination | Fixed Fee | Equivalent levels (level 0) |
+| --- | ---: | ---: |
+| Nether ↔ Overworld | 55 XP | ~5 levels |
+| Any ↔ End | 160 XP | ~10 levels |
 
 ## Ownership and Destruction
 
@@ -214,33 +219,34 @@ The interface supports:
 Default `config.yml`:
 
 ```yaml
-# Time in ticks the player must stand on a waystone before teleporting
+# Time in ticks the player must stand on a waystone before teleporting (1 tick = 50ms)
 standing-delay: 10
 
-# Cooldown in seconds before the player can teleport again
-teleport-cooldown: 3
-
-# Allow teleporting between different dimensions
+# Allow teleporting between different dimensions (Overworld, Nether, End)
 cross-dimension: true
 
-# Charge XP levels for teleporting
+# Charge XP points to teleport (cost grows linearly with distance)
 teleport-cost-enabled: true
 
-# Same-world cost: floor(sqrt(distance / teleport-cost-scale))
-teleport-cost-scale: 100
+# Divides distance to get XP point cost — higher value = cheaper teleports
+# cost = floor(distance / scale) — e.g. scale 20: 1000 blocks = 50 XP points
+teleport-cost-scale: 20
 
-# Fixed XP level cost for cross-dimension teleporting
-cross-dimension-cost: 5
+# Fixed XP fee added on top of distance cost for cross-dimension teleports (default = 55 = levels 0→5)
+cross-dimension-fee: 55
+
+# Fixed XP fee for teleports involving the End (default = 160 = levels 0→10)
+end-dimension-fee: 160
 ```
 
 | Option | Default | Description |
 | --- | ---: | --- |
-| `standing-delay` | `10` | Number of ticks represented by the required standing delay. One tick is 50 ms. |
-| `teleport-cooldown` | `3` | Seconds before the player can teleport again. |
+| `standing-delay` | `10` | Ticks the player must stand on a waystone before teleporting. One tick is 50 ms. |
 | `cross-dimension` | `true` | Enables travel between different worlds or dimensions. |
-| `teleport-cost-enabled` | `true` | Enables XP level costs. |
-| `teleport-cost-scale` | `100` | Controls the same-world distance cost. Higher values make travel cheaper. |
-| `cross-dimension-cost` | `5` | Fixed number of levels charged when changing worlds. |
+| `teleport-cost-enabled` | `true` | Enables XP point costs for teleporting. |
+| `teleport-cost-scale` | `20` | Divides distance to get the raw XP cost. Higher values make travel cheaper. |
+| `cross-dimension-fee` | `55` | Fixed XP fee added for Nether ↔ Overworld teleports, on top of the distance cost. |
+| `end-dimension-fee` | `160` | Fixed XP fee added for any teleport involving the End. |
 
 ## Data Storage
 
@@ -262,7 +268,7 @@ Locations are serialized as:
 world_name,x,y,z
 ```
 
-Waystones and player data are loaded into memory when the plugin starts or `/waystone reload` is executed. Teleport cooldowns are kept only in memory and are reset by a server restart.
+Waystones and player data are loaded into memory when the plugin starts or `/waystone reload` is executed. The block-until-leave state (preventing immediate re-teleport after arriving) is kept only in memory and is reset by a server restart.
 
 ## Project Structure
 
