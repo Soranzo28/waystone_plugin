@@ -150,13 +150,29 @@ public class WaystoneManager {
         return plugin.getConfig().getBoolean("teleport-cost-enabled", true);
     }
 
-    public int getTeleportCost(Location from, Location to) {
+    public int getTeleportCostXp(Location from, Location to) {
+        int scale = plugin.getConfig().getInt("teleport-cost-scale", 20);
         if (!from.getWorld().equals(to.getWorld())) {
-            return plugin.getConfig().getInt("cross-dimension-cost", 5);
+            boolean involvesEnd = from.getWorld().getEnvironment() == org.bukkit.World.Environment.THE_END
+                    || to.getWorld().getEnvironment() == org.bukkit.World.Environment.THE_END;
+            int fee = involvesEnd
+                    ? plugin.getConfig().getInt("end-dimension-fee", 160)
+                    : plugin.getConfig().getInt("cross-dimension-fee", 55);
+            double dx = from.getX() - to.getX();
+            double dz = from.getZ() - to.getZ();
+            return calculateCostXp(Math.sqrt(dx * dx + dz * dz), scale) + fee;
         }
-        int scale = plugin.getConfig().getInt("teleport-cost-scale", 100);
-        double distance = from.distance(to);
-        return (int) Math.sqrt(distance / scale);
+        return calculateCostXp(from.distance(to), scale);
+    }
+
+    public static double xpToLevel(int xp) {
+        if (xp <= 352)  return -3 + Math.sqrt(9 + xp);
+        if (xp <= 1507) return (40.5 + Math.sqrt(10.0 * xp - 1959.75)) / 5;
+        return (162.5 + Math.sqrt(18.0 * xp - 13553.75)) / 9;
+    }
+
+    static int calculateCostXp(double distance, int scale) {
+        return (int) (distance / scale);
     }
 
     public boolean isOnCooldown(UUID uuid) {

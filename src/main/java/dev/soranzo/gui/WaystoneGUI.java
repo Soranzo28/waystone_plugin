@@ -152,18 +152,22 @@ public class WaystoneGUI implements InventoryHolder {
                 int dist = (int) Math.round(originLoc.distance(waystoneLocation));
                 lore.add(Component.text(dist + " blocks away").color(clrLight));
                 if (wm.isTeleportCostEnabled()) {
-                    int cost = wm.getTeleportCost(originLoc, waystoneLocation);
-                    lore.add(cost == 0
-                        ? Component.text("Free").color(clrXp)
-                        : Component.text( cost + " XP level(s)").color(clrXp));
+                    lore.add(xpCostComponent(wm.getTeleportCostXp(originLoc, waystoneLocation), player, clrXp));
                 }
             } else {
                 lore.add(Component.text("Different dimension").color(clrLight));
+                boolean involvesNether = originLoc.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER
+                        || waystoneLocation.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER;
+                if (involvesNether) {
+                    lore.add(Component.text("~" + overworldEquivDistance(originLoc, waystoneLocation) + " blocks (overworld)").color(clrLight));
+                } else {
+                    double dx = originLoc.getX() - waystoneLocation.getX();
+                    double dz = originLoc.getZ() - waystoneLocation.getZ();
+                    int dist = (int) Math.round(Math.sqrt(dx * dx + dz * dz));
+                    lore.add(Component.text("~" + dist + " blocks away").color(clrLight));
+                }
                 if (wm.isTeleportCostEnabled()) {
-                    int cost = wm.getTeleportCost(originLoc, waystoneLocation);
-                    lore.add(cost == 0
-                        ? Component.text("Free").color(clrXp)
-                        : Component.text(cost + " XP").color(clrXp));
+                    lore.add(xpCostComponent(wm.getTeleportCostXp(originLoc, waystoneLocation), player, clrXp));
                 }
             }
 
@@ -186,6 +190,24 @@ public class WaystoneGUI implements InventoryHolder {
             inventory.setItem(slot, waystoneItem);
             slot++;
         }
+    }
+
+    private static int overworldEquivDistance(Location a, Location b) {
+        Location nether = a.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER ? a : b;
+        Location other  = nether == a ? b : a;
+        double dx = nether.getX() * 8 - other.getX();
+        double dz = nether.getZ() * 8 - other.getZ();
+        return (int) Math.round(Math.sqrt(dx * dx + dz * dz));
+    }
+
+    private static Component xpCostComponent(int costXp, Player player, TextColor clrXp) {
+        if (costXp == 0) return Component.text("Free").color(clrXp);
+        int totalXp = player.calculateTotalExperiencePoints();
+        if (totalXp >= costXp) {
+            double drop = WaystoneManager.xpToLevel(totalXp) - WaystoneManager.xpToLevel(totalXp - costXp);
+            return Component.text(String.format("%.1f levels", drop)).color(clrXp);
+        }
+        return Component.text(String.format("%.1f levels needed", WaystoneManager.xpToLevel(costXp))).color(TextColor.color(0xff6b6b));
     }
 
     public String getOriginLocation(){

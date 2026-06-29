@@ -19,8 +19,9 @@ public class Waystone extends JavaPlugin {
         saveConfig();
         WaystoneRecipe.register(this);
         getServer().getPluginManager().registerEvents(new WaystoneRegisterListener(this), this);
-        getServer().getPluginManager().registerEvents(new AdminGUIListener(wm), this);
-        Bukkit.getScheduler().runTaskTimer(this, new WaystoneTeleportTask(wm), 0L, 10L);
+        WaystoneTeleportTask teleportTask = new WaystoneTeleportTask(wm);
+        Bukkit.getScheduler().runTaskTimer(this, teleportTask, 0L, 10L);
+        getServer().getPluginManager().registerEvents(new AdminGUIListener(wm, teleportTask), this);
         WaystoneCommand waystoneCommand = new WaystoneCommand(wm);
         getCommand("waystone").setExecutor(waystoneCommand);
         getCommand("waystone").setTabCompleter(waystoneCommand);

@@ -34,9 +34,11 @@ public class AdminGUIListener implements Listener {
     private static final TextColor RED    = TextColor.color(0xff6b6b);
 
     private final WaystoneManager wm;
+    private final WaystoneTeleportTask teleportTask;
 
-    public AdminGUIListener(WaystoneManager wm) {
+    public AdminGUIListener(WaystoneManager wm, WaystoneTeleportTask teleportTask) {
         this.wm = wm;
+        this.teleportTask = teleportTask;
     }
 
     private void playNavSound(Player player) {
@@ -150,6 +152,7 @@ public class AdminGUIListener implements Listener {
                 player.closeInventory();
                 Location tpLoc = location.clone().add(0.5, 1, 0.5);
                 player.teleport(tpLoc);
+                teleportTask.addBlockedUntilLeave(player.getUniqueId());
                 player.sendActionBar(Component.text("✦ Teleported to ").color(LIGHT)
                         .append(Component.text(ws.name()).color(NAME)));
                 player.playSound(tpLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 0.9f, 1.1f);

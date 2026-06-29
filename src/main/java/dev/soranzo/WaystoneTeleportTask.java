@@ -17,15 +17,19 @@ import org.bukkit.entity.Player;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class WaystoneTeleportTask implements Runnable {
     private final WaystoneManager wm;
     private final HashMap<UUID, Long> standingOn = new HashMap<>();
+    private final HashSet<UUID> blockedUntilLeave = new HashSet<>();
 
     public WaystoneTeleportTask(WaystoneManager wm) {
         this.wm = wm;
     }
+
+    public void addBlockedUntilLeave(UUID uuid) { this.blockedUntilLeave.add(uuid); }
 
     @Override
     public void run() {
@@ -33,11 +37,15 @@ public class WaystoneTeleportTask implements Runnable {
             Block blockBelow = player.getLocation().getBlock().getRelative(BlockFace.DOWN);
             if (blockBelow.getType() != Material.LODESTONE) {
                 standingOn.remove(player.getUniqueId());
+                blockedUntilLeave.remove(player.getUniqueId());
                 continue;
             }
-            if (!wm.isThisBlockWaystone(blockBelow.getLocation())) continue;
+            if (!wm.isThisBlockWaystone(blockBelow.getLocation())) {
+                blockedUntilLeave.remove(player.getUniqueId());
+                continue;
+            }
             if (!player.hasPermission("waystones.use")) continue;
-            if (wm.isOnCooldown(player.getUniqueId())) continue;
+            if (blockedUntilLeave.contains(player.getUniqueId())) continue;
             if (!wm.getWaystoneStatus(blockBelow.getLocation())) {
                 standingOn.remove(player.getUniqueId());
                 player.sendActionBar(Component.text("✦ This waystone is not active.")
@@ -80,21 +88,21 @@ public class WaystoneTeleportTask implements Runnable {
             Location originLoc = player.getLocation().clone();
 
             if (wm.isTeleportCostEnabled()) {
-                int cost = wm.getTeleportCost(originLoc, tpLocation);
-                if (player.getLevel() < cost) {
-                    player.sendActionBar(Component.text("✦ Not enough XP — need " + cost + " level(s).")
+                int costXp = wm.getTeleportCostXp(originLoc, tpLocation);
+                if (player.calculateTotalExperiencePoints() < costXp) {
+                    player.sendActionBar(Component.text(String.format("✦ Not enough XP — need %.1f levels.", WaystoneManager.xpToLevel(costXp)))
                             .color(TextColor.color(0xff6b6b)));
                     standingOn.remove(player.getUniqueId());
                     continue;
                 }
-                player.setLevel(player.getLevel() - cost);
+                player.setExperienceLevelAndProgress(player.calculateTotalExperiencePoints() - costXp);
             }
 
             originLoc.getWorld().spawnParticle(Particle.PORTAL,
                     originLoc.clone().add(0, 0.5, 0), 60, 0.4, 0.8, 0.4, 0.2);
 
             player.teleport(tpLocation);
-            wm.setCooldown(player.getUniqueId());
+            blockedUntilLeave.add(player.getUniqueId());
 
             WaystoneYamlDTO destData = wm.getWaystones().get(connectionString);
             String destName = destData != null ? destData.name() : "Waystone";
